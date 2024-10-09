@@ -26,7 +26,7 @@ def print_trainable_parameters(model):
 
 def parse_args():
 
-    parser = argparse.ArgumentParser(description="PEFT finetune llama3 model")
+    parser = argparse.ArgumentParser(description="PEFT finetune tower")
     parser.add_argument(
         "--model_id",
         type=str,
@@ -124,10 +124,11 @@ def parse_args():
 
 def main():
 
-    model_id = "Unbabel/TowerInstruct-7B-v0.2"
-    #"/home/mrios/workspace/controlled_LLM/llama-2-7b-hf" 
-    max_length = 512 #1024
-    #max_target_length = 512
+    args = parse_args()
+
+    model_id = args.model_id  
+    max_length = args.max_length 
+   
     code2lang = {
     "de": "German",
     "fr": "French",
@@ -139,20 +140,18 @@ def main():
     "ro": "Romanian",
     "es": "Spanish"
     }
-    #source_code = 'en'
-    #target_code = 'de'
+   
     data_files = {}
-    #"data/en-de_ro_es.emea-iate.train.split1.json
-    data_files["train"] = "data/en-de_ro_es.emea-iate.train.inst-tower.json" #"data/en-de.emea.20k.train.json"
-    #"data/en-de.emea.5k.train2.json"
-    #https://arxiv.org/pdf/2312.12740.pdf trainig size 20k
-    output_dir = 'models/tower-7b-en_de_es_ro-emea_1epoch_4bit_ft4'
-    train_bs = 2
-    grad_acc = 2
-    lr = 2e-5
-    w_steps = 0.03
-    n_epoch = 1
-    lr_scheduler_type = "cosine"
+   
+    data_files["train"] = args.train_file 
+ 
+    output_dir = args.output_dir
+    train_bs = args.train_bs 
+    grad_acc = args.grad_acc 
+    lr = args.lr 
+    w_steps = args.w_steps 
+    n_epoch = args.n_epoch
+    lr_scheduler_type = args.lr_scheduler_type 
 
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
@@ -170,9 +169,9 @@ def main():
     model = prepare_model_for_kbit_training(model)
 
     config = LoraConfig( #BEST MODEL!!
-        r=64, 
-        lora_alpha=16, 
-        lora_dropout=0.1, #0.05
+        r=args.lora_r, 
+        lora_alpha=args.lora_alpha, 
+        lora_dropout=args.lora_dropout, #0.05
         bias="none",
         task_type="CAUSAL_LM",
         target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
@@ -197,7 +196,7 @@ def main():
     data = load_dataset("json", data_files=data_files)
    
     column_names = data["train"].column_names
-    #print(column_names)
+  
     data = data.map(preprocess_parallel_function,
                     batched=True)
 

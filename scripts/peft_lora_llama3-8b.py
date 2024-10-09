@@ -130,10 +130,9 @@ def main():
 
     args = parse_args()
 
-    model_id = args.model_id #"/media/mrios/data/workspace2/llama/Meta-Llama-3.1-8B-Instruct/llama3.1-8B-instruct-hf" 
-    #"/home/mrios/workspace/controlled_LLM/llama-2-7b-hf" 
-    max_length = args.max_length #512 #1024
-    #max_target_length = 512
+    model_id = args.model_id 
+    max_length = args.max_length 
+   
     code2lang = {
     "de": "German",
     "fr": "French",
@@ -145,20 +144,18 @@ def main():
     "ro": "Romanian",
     "es": "Spanish"
     }
-    #source_code = 'en'
-    #target_code = 'de'
+   
     data_files = {}
-    #"data/en-de_ro_es.emea-iate.train.split1.json
-    data_files["train"] = args.train_file #"data/en-de_ro_es.emea-iate.train.llama3.json" #"data/en-de.emea.20k.train.json"
-    #"data/en-de.emea.5k.train2.json"
-    #https://arxiv.org/pdf/2312.12740.pdf trainig size 20k
-    output_dir = args.output_dir #'models/llama3-8b-instruct-en_de_es_ro-emea_1epoch_4bit_ft3'
-    train_bs = args.train_bs #1
-    grad_acc = args.grad_acc #4
-    lr = args.lr #2e-5
-    w_steps = args.w_steps #0.03
-    n_epoch = args.n_epoch #1
-    lr_scheduler_type = args.lr_scheduler_type #"linear"
+    
+    data_files["train"] = args.train_file 
+    
+    output_dir = args.output_dir
+    train_bs = args.train_bs
+    grad_acc = args.grad_acc
+    lr = args.lr 
+    w_steps = args.w_steps 
+    n_epoch = args.n_epoch 
+    lr_scheduler_type = args.lr_scheduler_type 
 
     bnb_config = BitsAndBytesConfig(load_in_4bit=True,
                                     bnb_4bit_use_double_quant=True,
@@ -187,8 +184,7 @@ def main():
     print(model)
 
     def preprocess_parallel_function(examples):
-        #src_lang = code2lang[source_code]
-        #tgt_lang = code2lang[target_code]
+       
         inputs = [ex['text'] for ex in examples["translation"]]       
        
         model_inputs = tokenizer(inputs, max_length=max_length, truncation=True)
