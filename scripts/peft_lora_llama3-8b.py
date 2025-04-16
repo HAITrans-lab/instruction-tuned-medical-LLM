@@ -168,7 +168,7 @@ def main():
                                                  quantization_config=bnb_config, 
                                                  device_map={"": 0})
 
-    model.gradient_checkpointing_enable()
+    #model.gradient_checkpointing_enable()
     model = prepare_model_for_kbit_training(model)
 
     config = LoraConfig(r=args.lora_r, 
